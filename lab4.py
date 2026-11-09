@@ -108,7 +108,7 @@ def metrics(tp, fp, fn):
 
 
 def fmt(value):
-    return "–" if value is None else f"{value:.2f}"
+    return "-" if value is None else f"{value:.2f}"
 
 
 def table(header, rows):
@@ -142,28 +142,15 @@ def write(name, lines):
 def task1(model, images, paths, image_ids):
     out_dir = RESULTS / "task1"
     out_dir.mkdir(parents=True, exist_ok=True)
-    # the first call initializes the model on the device, so it would skew the timing of image 1
-    predict(model, paths[image_ids[0]], TASK1_CONF)
-
-    rows, details = [], []
+    lines = ["# Task 1. Object detection with YOLO26", "",
+             f"Model `{MODEL}` (Ultralytics, trained on MS COCO, {len(model.names)} classes), "
+             f"input size {IMAGE_SIZE}×{IMAGE_SIZE}, confidence threshold {TASK1_CONF}.", "",
+             "## Detected objects (class, confidence, box size)", ""]
     for n, image_id in enumerate(image_ids, start=1):
         result, found = predict(model, paths[image_id], TASK1_CONF)
         cv2.imwrite(str(out_dir / f"{n:02d}_{image_id}.jpg"), result.plot())
-        info, speed = images[image_id], result.speed
-        rows.append([n, info["file_name"], f"{info['width']}×{info['height']}", len(found),
-                     f"{speed['preprocess']:.1f} / {speed['inference']:.1f} / {speed['postprocess']:.1f}"])
-        details += [f"### Image {n} ({info['file_name']})", "",
-                    f"File: `results/task1/{n:02d}_{image_id}.jpg`", "", describe(found), ""]
-
-    write("task1_report.md", [
-        "# Task 1. Object detection with YOLO26", "",
-        f"- Model: `{MODEL}` (Ultralytics, trained on MS COCO, {len(model.names)} classes)",
-        f"- Input size: {IMAGE_SIZE}×{IMAGE_SIZE} (a multiple of 32)",
-        f"- Device: {model.device}",
-        f"- Confidence threshold: {TASK1_CONF}", "",
-        *table(["#", "COCO file", "Size", "Objects", "Time, ms (preprocess / inference / postprocess)"], rows),
-        "", "## Detected objects (class, confidence, box size)", "", *details,
-    ])
+        lines.append(f"- Image {n} (`{images[image_id]['file_name']}`, {len(found)} objects): {describe(found)}")
+    write("task1_report.md", lines)
 
 
 def task2(model, images, objects, paths, image_ids):

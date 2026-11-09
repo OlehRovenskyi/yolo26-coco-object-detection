@@ -4,9 +4,11 @@ Lab work 4 for "Information Technologies in Scientific Research": detecting obje
 images with a convolutional neural network. The assignment describes YOLOv4; by agreement with the teacher
 this project uses the newest Ultralytics model, **YOLO26**.
 
+Repository: https://github.com/OlehRovenskyi/yolo26-coco-object-detection
+
 | Task | What the script does |
 |---|---|
-| 1 | Detects objects of all 80 COCO classes on 10 images and measures processing time |
+| 1 | Detects objects of all 80 COCO classes on 10 images |
 | 2 | Computes precision (p) and recall (r) on 10 COCO val2017 images for confidence 0.3, 0.5, 0.7, 0.9, picks the best threshold by F1 and finds the 3 worst results |
 | 3 | Detects only the classes of variant 21: `remote` and `cell phone` (model class ids 65 and 67) |
 
@@ -19,6 +21,7 @@ this project uses the newest Ultralytics model, **YOLO26**.
 ## Setup
 
 ```bash
+git clone https://github.com/OlehRovenskyi/yolo26-coco-object-detection.git
 cd yolo26-coco-object-detection
 
 # 1. Virtual environment and packages
@@ -51,12 +54,13 @@ The console prints p, r and F1 for each threshold and the best threshold.
 
 | Path | Contents |
 |---|---|
-| `results/task1_report.md` | Model, input size, device, timing per image, list of detected objects |
+| `results/task1_report.md` | Model settings and the list of detected objects on each image |
 | `results/task1/` | Images with detected objects (class and confidence) |
 | `results/task2_report.md` | Selected images, p/r table, totals with F1, best threshold, 3 worst results with explanation |
 | `results/task2/conf_<threshold>/` | Images for each threshold: blue is a correct detection (TP), red is a false detection (FP), yellow is a missed object from the COCO annotation (FN) |
 | `results/task3_report.md` | Variant 21 results: classes on each image, detections with and without the class filter |
 | `results/task3/` | `NN_all_classes.jpg` (all classes) and `NN_variant_only.jpg` (only remote and cell phone) |
+| `results/ІТ_НД_лаб_4_Ровенський_Олег_G3.docx` | Lab report (in Ukrainian) |
 
 Original images are in `data/val2017/` under their COCO file names, e.g. `results/task1/02_81394.jpg` is
 `data/val2017/000000081394.jpg`.
@@ -64,7 +68,7 @@ Original images are in `data/val2017/` under their COCO file names, e.g. `result
 ## How it works
 
 - **Image selection.** Images come from COCO val2017, because it has annotations; test2017 does not.
-  For tasks 1–2 the script randomly takes 10 images with at least 3 object classes and at most 12 objects.
+  For tasks 1-2 the script randomly takes 10 images with at least 3 object classes and at most 12 objects.
   For task 3 it takes 4 images that contain both a remote and a cell phone and at least 5 classes in total.
   Images with "crowd" annotations are skipped. The random seed is fixed (`SEED = 42`), so every run selects the same images.
 - **Matching.** A detection is a true positive (TP) when its class matches an annotated object and their
@@ -84,7 +88,7 @@ All settings are constants at the top of `lab4.py`:
 | `TASK1_CONF` | `0.5` | Confidence threshold for task 1 |
 | `THRESHOLDS` | `[0.3, 0.5, 0.7, 0.9]` | Confidence thresholds for task 2 |
 | `IOU_MATCH` | `0.5` | Minimum IoU for a correct detection |
-| `NUM_IMAGES` | `10` | Number of images for tasks 1–2 |
+| `NUM_IMAGES` | `10` | Number of images for tasks 1-2 |
 | `SEED` | `42` | Random seed for image selection |
 | `VARIANT`, `VARIANT_CLASSES` | `21`, `["remote", "cell phone"]` | Variant number and its COCO class names |
 
